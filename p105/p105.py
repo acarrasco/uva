@@ -2,13 +2,15 @@ import sys
 import heapq
 
 buildings = [tuple(map(int, line.strip().split())) for line in sys.stdin]
-rightmost = max(r for l,h,r in buildings)
+edges = [0] + sorted(set([l for l,h,r in buildings] + [r for l,h,r in buildings]))
+
+#reversed because removing the last element is more eficient than the head
 remaining = buildings[::-1]
 
-#this is a heap to keep the windows that overlap over i
+#this is a heap to keep track of the buildings that overlap over i as we iterate
 current = []
 previousHeight = 0
-for i in range(rightmost):
+for i in edges[:-1]:
 	#add to the current window all buildings whose left is less than the query index
 	while remaining and remaining[-1][0] <= i:
 		l,h,r = remaining.pop()
@@ -24,4 +26,4 @@ for i in range(rightmost):
 		print(i, h, end=' ')
 		previousHeight = h
 
-print(rightmost, 0)
+print(edges[-1], 0)
