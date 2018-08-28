@@ -57,20 +57,23 @@ def generate_fx_sequences_through(i, j, k, fx_sequences):
 		
 def arbitrage(rates):
 	n = len(rates)
+	def shorter_than_n(fx_sequence):
+		return len(fx_sequence) <= n
+		
 	fx_sequences = [[[i, j] for j in range(n)] for i in range(n)]
 	value = partial(fx_sequence_value, rates)
 	old_fx_sequences = None
 	while (old_fx_sequences != fx_sequences and
 	       not profitable_fx_sequence(rates, fx_sequences)):
 		old_fx_sequences = deepcopy(fx_sequences)
-		print(old_fx_sequences)
+		#print(old_fx_sequences)
 		for i in range(n):
 			for j in range(n):
 				for k in range(n):
-					candidates = list(generate_fx_sequences_through(i, j, k, old_fx_sequences))
-					print('i=%s j=%s k=%s candidates=%s' % (i, j, k, [(x, value(x)) for x in candidates]))
+					candidates = list(filter(shorter_than_n, generate_fx_sequences_through(i, j, k, old_fx_sequences)))
+					#print('i=%s j=%s k=%s candidates=%s' % (i, j, k, [(x, value(x)) for x in candidates]))
 					best = max(candidates, key=lambda x:(value(x), -len(x)))
-					print('best=%s' % (best,))
+					#print('best=%s' % (best,))
 					fx_sequences[i][j] = max(fx_sequences[i][j], best, key=lambda x:(value(x), -len(x)))
 	v = profitable_fx_sequence(rates, fx_sequences)
 	if v:
